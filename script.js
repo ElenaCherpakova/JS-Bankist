@@ -63,12 +63,14 @@ const inputClosePin = document.querySelector('.form__input--pin');
 
 const displayMovements = movements => {
   //clean up before populating
-  containerMovements.innerHTML = "";
+  containerMovements.innerHTML = '';
   movements.forEach((mov, i) => {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
     const html = `
     <div class="movements__row">
-          <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
+          <div class="movements__type movements__type--${type}">${
+      i + 1
+    } ${type}</div>
           <div class="movements__value">${mov}</div>
         </div>`;
     containerMovements.insertAdjacentHTML('afterbegin', html);
@@ -77,14 +79,71 @@ const displayMovements = movements => {
 
 displayMovements(account1.movements);
 
-// LECTURES
+const user = 'Steven Thomas Williams';
 
-const currencies = new Map([
-  ['USD', 'United States dollar'],
-  ['EUR', 'Euro'],
-  ['GBP', 'Pound sterling'],
-]);
+const createUsernames = accs => {
+  accs.forEach(acc => {
+    acc.userName = acc.owner
+      .toLocaleLowerCase()
+      .split(' ')
+      .map(name => name[0])
+      .join('');
+  });
+};
 
 const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
-/////////////////////////////////////////////////
+const deposits = movements.filter(mov => {
+  return mov > 0;
+});
+
+const calDisplayBalance = movements => {
+  const balance = movements.reduce((acc, mov) => acc + mov, 0);
+  labelBalance.textContent = `${balance} EUR`;
+};
+console.log(calDisplayBalance(account1.movements));
+
+const calcDisplaySummary = movements => {
+  const incomes = movements
+    .filter(mov => mov > 0)
+    .reduce((acc, mov) => acc + mov, 0);
+  const out = movements
+    .filter(mov => mov < 0)
+    .reduce((acc, mov) => acc + mov, 0);
+  const interest = movements
+    .filter(mov => mov > 0)
+    .map(deposit => (deposit * 1.2) / 100)
+    .filter(interest => interest >= 1)
+    .reduce((acc, interest) => acc + interest, 0);
+  console.log({ interest });
+  labelSumIn.textContent = `${incomes}€`;
+  labelSumOut.textContent = `${Math.abs(out)}€`;
+  labelSumInterest.textContent = `${interest}€`;
+};
+
+console.log(calcDisplaySummary(account1.movements));
+
+const max = movements.reduce((acc, mov) => {
+  if (acc > mov) return acc;
+  else return mov;
+}, movements[0]);
+console.log(max);
+
+const eurToUsd = 1.04;
+const totalDepositUSD = movements
+  .filter(mov => mov > 0)
+  .map(mov => mov * eurToUsd)
+  .reduce((acc, mov) => acc + mov, 0);
+console.log(totalDepositUSD);
+
+// const movementsUSD = movements.map(mov => mov * eurToUsd);
+// console.log(movementsUSD);
+
+// const movementDescription = movements.map(
+//   (mov, index) =>
+//     `Movement ${index + 1}: You ${
+//       mov > 0 ? 'deposited' : 'withdrew'
+//     } ${Math.abs(mov)}`
+// );
+
+// console.log(movementDescription);
