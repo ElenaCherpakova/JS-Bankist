@@ -1,7 +1,4 @@
 'use strict';
-
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
 // BANKIST APP
 
 // Data
@@ -71,7 +68,7 @@ const displayMovements = movements => {
           <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
-          <div class="movements__value">${mov}</div>
+          <div class="movements__value">${mov}€</div>
         </div>`;
     containerMovements.insertAdjacentHTML('afterbegin', html);
   });
@@ -91,6 +88,7 @@ const createUsernames = accs => {
   });
 };
 
+createUsernames(accounts);
 const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 const deposits = movements.filter(mov => {
@@ -99,12 +97,11 @@ const deposits = movements.filter(mov => {
 
 const calDisplayBalance = movements => {
   const balance = movements.reduce((acc, mov) => acc + mov, 0);
-  labelBalance.textContent = `${balance} EUR`;
+  labelBalance.textContent = `${balance}€`;
 };
-console.log(calDisplayBalance(account1.movements));
 
-const calcDisplaySummary = movements => {
-  const incomes = movements
+const calcDisplaySummary = (acc) => {
+  const incomes = acc.movements
     .filter(mov => mov > 0)
     .reduce((acc, mov) => acc + mov, 0);
   const out = movements
@@ -112,7 +109,7 @@ const calcDisplaySummary = movements => {
     .reduce((acc, mov) => acc + mov, 0);
   const interest = movements
     .filter(mov => mov > 0)
-    .map(deposit => (deposit * 1.2) / 100)
+    .map(deposit => (deposit * acc.interestRate) / 100)
     .filter(interest => interest >= 1)
     .reduce((acc, interest) => acc + interest, 0);
   console.log({ interest });
@@ -121,29 +118,51 @@ const calcDisplaySummary = movements => {
   labelSumInterest.textContent = `${interest}€`;
 };
 
-console.log(calcDisplaySummary(account1.movements));
-
 const max = movements.reduce((acc, mov) => {
   if (acc > mov) return acc;
   else return mov;
 }, movements[0]);
-console.log(max);
+// console.log(max);
 
 const eurToUsd = 1.04;
 const totalDepositUSD = movements
   .filter(mov => mov > 0)
   .map(mov => mov * eurToUsd)
   .reduce((acc, mov) => acc + mov, 0);
-console.log(totalDepositUSD);
+// console.log(totalDepositUSD);
 
-// const movementsUSD = movements.map(mov => mov * eurToUsd);
-// console.log(movementsUSD);
+//Implementing Login logic
 
-// const movementDescription = movements.map(
-//   (mov, index) =>
-//     `Movement ${index + 1}: You ${
-//       mov > 0 ? 'deposited' : 'withdrew'
-//     } ${Math.abs(mov)}`
-// );
+//Create Event Handler
 
-// console.log(movementDescription);
+btnLogin.addEventListener('click', loginFunc);
+
+let currentAccount;
+
+function loginFunc(e) {
+  e.preventDefault();
+  currentAccount = accounts.find(
+    acc => acc.userName === inputLoginUsername.value
+  );
+
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+    //Display UI and Welcome message
+    labelWelcome.textContent = `Welcome back, ${
+      currentAccount.owner.split(' ')[0]
+    }!`;
+//Clear input fields
+    inputLoginUsername.value = inputLoginPin.value = '';
+    inputLoginPin.blur();
+
+    //Display movements
+
+    containerApp.style.opacity = 100;
+    displayMovements(currentAccount.movements);
+
+    //Display balance
+    calDisplayBalance(currentAccount.movements);
+
+    //Display summary
+    calcDisplaySummary(currentAccount);
+  }
+}
