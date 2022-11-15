@@ -132,16 +132,15 @@ const totalDepositUSD = movements
   .reduce((acc, mov) => acc + mov, 0);
 // console.log(totalDepositUSD);
 
-//Implementing Login logic
-
 //Create Event Handler
 
 btnLogin.addEventListener('click', loginFunc);
 btnTransfer.addEventListener('click', transferFunc);
-btnClose.addEventListener('click', deleteAcc);
+btnLoan.addEventListener('click', requestLoanFunc);
+btnClose.addEventListener('click', deleteAccFunc);
 
+//Implementing Login logic
 let currentAccount;
-
 function loginFunc(e) {
   e.preventDefault();
   currentAccount = accounts.find(
@@ -192,7 +191,19 @@ function transferFunc(e) {
   }
 }
 
-function deleteAcc(e) {
+function requestLoanFunc(e) {
+  e.preventDefault();
+  const amount = Number(inputLoanAmount.value);
+  if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
+    //Add movement
+    currentAccount.movements.push(amount);
+    //Update UI
+    updateUI(currentAccount);
+  }
+  inputLoanAmount.value = '';
+}
+
+function deleteAccFunc(e) {
   e.preventDefault();
   if (
     inputCloseUsername.value === currentAccount.username &&
