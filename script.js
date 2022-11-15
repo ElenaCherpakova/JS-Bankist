@@ -113,7 +113,7 @@ const calcDisplaySummary = acc => {
     .map(deposit => (deposit * acc.interestRate) / 100)
     .filter(interest => interest >= 1)
     .reduce((acc, interest) => acc + interest, 0);
-  console.log({ interest });
+  // console.log({ interest });
   labelSumIn.textContent = `${incomes}€`;
   labelSumOut.textContent = `${Math.abs(out)}€`;
   labelSumInterest.textContent = `${interest}€`;
@@ -138,6 +138,7 @@ const totalDepositUSD = movements
 
 btnLogin.addEventListener('click', loginFunc);
 btnTransfer.addEventListener('click', transferFunc);
+btnClose.addEventListener('click', deleteAcc);
 
 let currentAccount;
 
@@ -160,7 +161,6 @@ function loginFunc(e) {
     updateUI(currentAccount);
   }
 }
-
 
 const updateUI = acc => {
   displayMovements(acc.movements);
@@ -190,4 +190,21 @@ function transferFunc(e) {
     //Update UI
     updateUI(currentAccount);
   }
+}
+
+function deleteAcc(e) {
+  e.preventDefault();
+  if (
+    inputCloseUsername.value === currentAccount.username &&
+    Number(inputClosePin.value) === currentAccount.pin
+  ) {
+    const userAccount = acc => acc.username === currentAccount.username;
+    const index = accounts.findIndex(userAccount);
+    accounts.splice(index, 1);
+    containerApp.style.opacity = 0;
+    labelWelcome.textContent = `Bye, ${
+      currentAccount.owner.split(' ')[0]
+    }. Hope to see you again!`;
+  }
+  inputCloseUsername.value = inputClosePin.value = '';
 }
