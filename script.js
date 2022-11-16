@@ -58,10 +58,12 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-const displayMovements = movements => {
+const displayMovements = (movements, sort = false) => {
   //clean up before populating
   containerMovements.innerHTML = '';
-  movements.forEach((mov, i) => {
+
+  const movs = sort ? movements.slice().sort((a, b) => a - b) : movements;
+  movs.forEach((mov, i) => {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
     const html = `
     <div class="movements__row">
@@ -138,7 +140,7 @@ btnLogin.addEventListener('click', loginFunc);
 btnTransfer.addEventListener('click', transferFunc);
 btnLoan.addEventListener('click', requestLoanFunc);
 btnClose.addEventListener('click', deleteAccFunc);
-
+btnSort.addEventListener('click', sortFunc);
 //Implementing Login logic
 let currentAccount;
 function loginFunc(e) {
@@ -163,10 +165,8 @@ function loginFunc(e) {
 
 const updateUI = acc => {
   displayMovements(acc.movements);
-
   //Display balance
   calDisplayBalance(acc);
-
   //Display summary
   calcDisplaySummary(acc);
 };
@@ -218,4 +218,11 @@ function deleteAccFunc(e) {
     }. Hope to see you again!`;
   }
   inputCloseUsername.value = inputClosePin.value = '';
+}
+
+let sorted = false;
+function sortFunc(e) {
+  e.preventDefault();
+  displayMovements(currentAccount.movements, !sorted);
+  sorted = !sorted;
 }
