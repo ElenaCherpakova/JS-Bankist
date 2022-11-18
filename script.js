@@ -135,12 +135,12 @@ const totalDepositUSD = movements
 // console.log(totalDepositUSD);
 
 //Create Event Handler
-
 btnLogin.addEventListener('click', loginFunc);
 btnTransfer.addEventListener('click', transferFunc);
 btnLoan.addEventListener('click', requestLoanFunc);
 btnClose.addEventListener('click', deleteAccFunc);
 btnSort.addEventListener('click', sortFunc);
+
 //Implementing Login logic
 let currentAccount;
 function loginFunc(e) {
@@ -149,7 +149,7 @@ function loginFunc(e) {
     acc => acc.username === inputLoginUsername.value
   );
 
-  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+  if (currentAccount?.pin === +inputLoginPin.value) {
     //Display UI and Welcome message
     labelWelcome.textContent = `Welcome back, ${
       currentAccount.owner.split(' ')[0]
@@ -172,7 +172,7 @@ const updateUI = acc => {
 };
 function transferFunc(e) {
   e.preventDefault();
-  const amount = Number(inputTransferAmount.value);
+  const amount = +inputTransferAmount.value;
   const receiverAcc = accounts.find(
     acc => acc.username === inputTransferTo.value
   );
@@ -193,7 +193,7 @@ function transferFunc(e) {
 
 function requestLoanFunc(e) {
   e.preventDefault();
-  const amount = Number(inputLoanAmount.value);
+  const amount = +inputLoanAmount.value;
   if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
     //Add movement
     currentAccount.movements.push(amount);
@@ -207,7 +207,7 @@ function deleteAccFunc(e) {
   e.preventDefault();
   if (
     inputCloseUsername.value === currentAccount.username &&
-    Number(inputClosePin.value) === currentAccount.pin
+    +inputClosePin.value === currentAccount.pin
   ) {
     const userAccount = acc => acc.username === currentAccount.username;
     const index = accounts.findIndex(userAccount);
