@@ -70,7 +70,7 @@ const displayMovements = (movements, sort = false) => {
           <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
-          <div class="movements__value">${mov}€</div>
+          <div class="movements__value">${mov.toFixed(2)}€</div>
         </div>`;
     containerMovements.insertAdjacentHTML('afterbegin', html);
   });
@@ -100,7 +100,7 @@ const deposits = movements.filter(mov => {
 const calDisplayBalance = acc => {
   const balance = acc.movements.reduce((acc, mov) => acc + mov, 0);
   acc.balance = balance;
-  labelBalance.textContent = `${balance}€`;
+  labelBalance.textContent = `${balance.toFixed(2)}€`;
 };
 
 const calcDisplaySummary = acc => {
@@ -116,9 +116,9 @@ const calcDisplaySummary = acc => {
     .filter(interest => interest >= 1)
     .reduce((acc, interest) => acc + interest, 0);
   // console.log({ interest });
-  labelSumIn.textContent = `${incomes}€`;
-  labelSumOut.textContent = `${Math.abs(out)}€`;
-  labelSumInterest.textContent = `${interest}€`;
+  labelSumIn.textContent = `${incomes.toFixed(2)}€`;
+  labelSumOut.textContent = `${Math.abs(out).toFixed(2)}€`;
+  labelSumInterest.textContent = `${interest.toFixed(2)}€`;
 };
 
 const max = movements.reduce((acc, mov) => {
@@ -193,7 +193,7 @@ function transferFunc(e) {
 
 function requestLoanFunc(e) {
   e.preventDefault();
-  const amount = +inputLoanAmount.value;
+  const amount = Math.floor(inputLoanAmount.value);
   if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
     //Add movement
     currentAccount.movements.push(amount);
