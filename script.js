@@ -83,7 +83,14 @@ const formatMovement = (date, locale) => {
   // const month = `${date.getMonth() + 1}`.padStart(2, 0);
   // const year = date.getFullYear();
   // return `${day}/${month}/${year}`;
-  return new Intl.DateTimeFormat(locale).format(date)
+  return new Intl.DateTimeFormat(locale).format(date);
+};
+
+const formatCur = (value, locale, currency) => {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: currency,
+  }).format(value);
 };
 
 const displayMovements = function (acc, sort = false) {
@@ -98,13 +105,15 @@ const displayMovements = function (acc, sort = false) {
     const date = new Date(acc.movementsDates[i]);
     const displayDate = formatMovement(date, acc.locale);
 
+    const formattedCurrency = formatCur(mov, acc.locale, acc.currency);
+
     const html = `
     <div class="movements__row">
           <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
       <div class="movements__date">${displayDate}</div>
-          <div class="movements__value">${mov.toFixed(2)}€</div>
+          <div class="movements__value">${formattedCurrency}</div>
         </div>`;
     containerMovements.insertAdjacentHTML('afterbegin', html);
   });
@@ -132,7 +141,9 @@ const deposits = movements.filter(mov => {
 const calDisplayBalance = acc => {
   const balance = acc.movements.reduce((acc, mov) => acc + mov, 0);
   acc.balance = balance;
-  labelBalance.textContent = `${balance.toFixed(2)}€`;
+  const formattedMovement = formatCur(acc.balance, acc.locale, acc.currency);
+
+  labelBalance.textContent = `${formattedMovement}`;
 };
 
 const calcDisplaySummary = acc => {
@@ -147,10 +158,13 @@ const calcDisplaySummary = acc => {
     .map(deposit => (deposit * acc.interestRate) / 100)
     .filter(interest => interest >= 1)
     .reduce((acc, interest) => acc + interest, 0);
-  // console.log({ interest });
-  labelSumIn.textContent = `${incomes.toFixed(2)}€`;
-  labelSumOut.textContent = `${Math.abs(out).toFixed(2)}€`;
-  labelSumInterest.textContent = `${interest.toFixed(2)}€`;
+
+  const formattedIncomes = formatCur(incomes, acc.locale, acc.currency);
+  const formattedOut = formatCur(out, acc.locale, acc.currency);
+  const formattedInterest = formatCur(interest, acc.locale, acc.currency);
+  labelSumIn.textContent = `${formattedIncomes}`;
+  labelSumOut.textContent = `${formattedOut}`;
+  labelSumInterest.textContent = `${formattedInterest}`;
 };
 
 const max = movements.reduce((acc, mov) => {
