@@ -187,8 +187,31 @@ btnLoan.addEventListener('click', requestLoanFunc);
 btnClose.addEventListener('click', deleteAccFunc);
 btnSort.addEventListener('click', sortFunc);
 
+const startLogOutTimer = function () {
+  //set time to 5 minutes
+  let time = 300;
+  //Call the timer every second
+  const tick = () => {
+    const min = String(Math.trunc(time / 60)).padStart(2, 0);
+    const sec = String(time % 60).padStart(2, 0);
+    labelTimer.textContent = `${min}:${sec}`;
+
+    //When 0 seconds, stop timer and log out user
+    if (time === 0) {
+      clearInterval(timer);
+      labelWelcome.textContent = 'Log in to get started';
+      containerApp.style.opacity = 0;
+    }
+    // In each call, print the remaining time to UI
+    //Decrease by 1s
+    time--;
+  };
+  tick();
+  const timer = setInterval(tick, 1000);
+  return timer;
+};
 //Implementing Login logic
-let currentAccount;
+let currentAccount, timer;
 
 function loginFunc(e) {
   e.preventDefault();
@@ -218,12 +241,9 @@ function loginFunc(e) {
       currentAccount.locale,
       options
     ).format(now);
-    // const day = `${now.getDate()}`.padStart(2, 0);
-    // const month = `${now.getMonth() + 1}`.padStart(2, 0);
-    // const year = now.getFullYear();
-    // const hour = `${now.getHours()}`.padStart(2, 0);
-    // const min = `${now.getMinutes()}`.padStart(2, 0);
-    // labelDate.textContent = `${day}/${month}/${year} ${hour}:${min}`;
+
+    if (timer) clearInterval(timer);
+    timer = startLogOutTimer();
 
     //Clear input fields
     inputLoginUsername.value = inputLoginPin.value = '';
@@ -239,10 +259,6 @@ const updateUI = acc => {
   //Display summary
   calcDisplaySummary(acc);
 };
-
-currentAccount = account1;
-updateUI(currentAccount);
-containerApp.style.opacity = 100;
 
 // const now = new Date();
 // const options = {
@@ -279,21 +295,35 @@ function transferFunc(e) {
 
     //Update UI
     updateUI(currentAccount);
+  } else {
+    Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: 'Not enough funds to make a transfer!',
+    });
   }
+  //Reset timer
+  clearInterval(timer);
+  timer = startLogOutTimer();
 }
 
 function requestLoanFunc(e) {
   e.preventDefault();
   const amount = Math.floor(inputLoanAmount.value);
   if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
-    //Add movement
-    currentAccount.movements.push(amount);
+    const timer = setTimeout(() => {
+      //Add movement
+      currentAccount.movements.push(amount);
 
-    //Add loan date
-    currentAccount.movementsDates.push(new Date().toISOString());
+      //Add loan date
+      currentAccount.movementsDates.push(new Date().toISOString());
 
-    //Update UI
-    updateUI(currentAccount);
+      //Update UI
+      updateUI(currentAccount);
+      //Reset timer
+      clearInterval(timer);
+      timer = startLogOutTimer();
+    }, 2500);
   }
   inputLoanAmount.value = '';
 }
@@ -328,3 +358,11 @@ function sortFunc(e) {
 //     if (i % 3 === 0) row.style.backgroundColor = 'blue';
 //   });
 // });
+
+// setInterval(() => {
+//   const date = new Date();
+//   const hour = `${date.getHours()}`.padStart(2, 0);
+//   const min = `${date.getMinutes()}`.padStart(2, 0);
+//   const seconds = `${date.getSeconds()}`.padStart(2, 0);
+//   console.log(`${hour}:${min}:${seconds}`);
+// }, 1000);
