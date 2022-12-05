@@ -253,7 +253,7 @@ const slider = function () {
     activateDot(0);
   };
   init();
-  //EventHadlers
+  //Event Handlers
   btnRight.addEventListener('click', nextSlide);
   btnLeft.addEventListener('click', prevSlide);
   document.addEventListener('keydown', e => {
